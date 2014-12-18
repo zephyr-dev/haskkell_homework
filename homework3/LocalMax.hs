@@ -1,49 +1,47 @@
 
 {- localMaxes :: [Int] -> [Int] -}
-{- localMaxes xs = map fst $ filter isLocalMax $ zip xs [0..] -}
-  {- where -}
-    {- isLocalMax :: (Int, Int) -> Bool -}
-    {- isLocalMax (x, i)   | i == (length xs)-1  = False -}
-                        {- | i == 0              = False -}
-                        {- | otherwise           = x > xs!!(i+1) && x > xs!!(i-1) -}
-
-
-
-
-
-{- localMaxes :: [Int] -> [Int] -}
-
 {- localMaxes xs@(x:y:z:_) | y > x && y > z  = y:(localMaxes $ tail xs) -}
                         {- | otherwise       = localMaxes $ tail xs -}
 {- localMaxes _ = [] -}
 
-{- import qualified Data.Map as M  -}
-{- import  Data.Foldable  -}
-{- import  Data.Monoid  -}
+import qualified Data.Map as M 
+import  Data.Foldable 
+import  Data.Monoid 
 
 
-{- data Histogram = Histogram Occurences -}
-{- type Occurences = M.Map Int Int -}
-
-{- [> type Occurences = Occurences { <] -}
-    {- [> number :: Int <] -}
-  {- [> , count  :: Int <] -}
-  {- [> } <] -}
+data Histogram = Histogram Occurences deriving Show
+type Occurences = M.Map Int Int
 
 
-{- instance Monoid Histogram where -}
-  {- mempty = Histogram mempty -- map (\x -> Occurences x 0) [1..9] -}
-  {- (Histogram x) `mappend` (Histogram y) = x `mappend` y -- Histogram $ foldr (\e acc ->   ) [] $ x ++ y -}
+{- class Monoid a where -}
+  {- mempty :: a -}
+  {- mappend :: a -> a -> a -}
+
+{- class Show a where -}
+  {- show :: a -> String -}
+
+{- class Eq a where -}
+  {- (==), (/=) :: a -> a -> Bool -}
+  {- x == y = not $ x /= y -}
+  {- x /= y = not $ x == y -}
+
+
+{- class (Eq a) => Ord a where -}
+  {- (>) :: Eq a => a -> a -> Bool -}
+
+instance  Histogram where
+  mempty = Histogram $ M.fromList $ zip [1..9] $ repeat 0 -- map (\x -> Occurences x 0) [1..9]
+  (Histogram x) `mappend` (Histogram y) = Histogram $ M.unionWith (+) x y
 
 
 
-{- histogram :: [Int] -> String -}
-{- histogram = render . countup -}
+histogram :: [Int] -> String
+histogram = render . countup
 
-{- countup :: [Int] -> Histogram -}
-{- countup = fold . map (\x -> Histogram $ M.singleton x 1) -}
+countup :: [Int] -> Histogram
+countup = fold . map (\x -> Histogram $ M.singleton x 1)
 
-{- render = show -}
+render = show
 
 
 
