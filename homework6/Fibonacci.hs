@@ -23,3 +23,36 @@ instance Show a => Show (Stream a) where
 
 streamToList :: Stream b -> [b]
 streamToList (Cons v1 s) = [v1] ++ (streamToList s)
+
+testStreamShow :: [a] -> Stream a
+testStreamShow l = Cons (value l) (newStream l)
+  where
+    value :: [a] -> a
+    value l1 = head l1
+    newStream :: [a] -> Stream a
+    newStream nl = testStreamShow $ tail nl
+
+
+
+streamRepeat :: a -> Stream a
+streamRepeat v = Cons v (streamRepeat v)
+
+
+streamMap :: (a -> b) -> Stream a -> Stream b
+streamMap f (Cons v s) = Cons (f v) (streamMap f s)
+
+
+streamFromSeed :: (a -> a) -> a -> Stream a
+streamFromSeed f x = Cons x (newStream f x)
+  where
+    newStream :: (a -> a) -> a -> Stream a
+    newStream d e = streamFromSeed d (d e)
+
+
+
+nats :: Stream Integer
+nats = streamFromSeed (+1) 0
+
+
+ruler :: Stream Integer
+ruler = undefined

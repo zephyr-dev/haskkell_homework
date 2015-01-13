@@ -5,7 +5,15 @@ xor l =  (foldr countTrues 0 l) `mod` 2 /= 0
     countTrues True i = i + 1
     countTrues _ i = i
 
+{- foldr :: (a -> x -> x) -> x -> [a] -> x -}
+{- foldr' :: (a -> [b] -> [b]) -> [b] -> [a] -> [b] -}
+
 map' :: (a -> b) -> [a] -> [b]
-map' f l
-  | length l == 1 = f $ head l
-  | length l > 1 = (map' $ (tail l)) ++ [(f $ head l)]
+map' f = foldr (\x acc -> (f x):acc ) []
+
+
+{- foldr :: (a -> b -> b) -> b -> [a] -> b -}
+
+
+myFoldl :: (b -> a -> b) -> b -> [a] -> b
+myFoldl f z xs = foldr (flip f) z (reverse xs)
