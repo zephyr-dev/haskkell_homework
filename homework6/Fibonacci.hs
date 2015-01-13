@@ -19,7 +19,7 @@ fibs1 = foldr (\x y -> (fib x):y) [] [1..]
 data Stream a = Cons a (Stream a)
 
 instance Show a => Show (Stream a) where
-  show s = show $ take 10 (streamToList s)
+  show s = show $ take 20 (streamToList s)
 
 streamToList :: Stream b -> [b]
 streamToList (Cons v1 s) = [v1] ++ (streamToList s)
@@ -55,4 +55,20 @@ nats = streamFromSeed (+1) 0
 
 
 ruler :: Stream Integer
-ruler = undefined
+ruler = interleaveStreams streamFromOdds streamFromEvens 
+  where 
+    interleaveStreams :: Stream a -> Stream a -> Stream a
+    interleaveStreams (Cons e1 s1) (Cons e2 s2) = Cons e1 $ Cons e2 $ interleaveStreams s1 s2 
+streamFromOdds :: Stream Integer
+streamFromOdds  = streamRepeat 0
+streamFromEvens :: Stream Integer
+streamFromEvens = streamMap determineRule natEvens 
+
+natEvens :: Stream Integer
+natEvens = streamFromSeed (+2) 2
+determineRule :: Integer -> Integer
+determineRule num = go num (floor $ logBase 2 $ fromIntegral num)
+  where
+    go num i 
+      | num `mod` (2 ^ i) == 0 = i
+      | otherwise = go num (i-1)
