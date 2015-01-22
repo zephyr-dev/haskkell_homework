@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances #-}
 fib :: Integer -> Integer
 fib 1 = 0
 fib 2 = 1
@@ -72,3 +73,13 @@ determineRule num = go num (floor $ logBase 2 $ fromIntegral num)
     go num i 
       | num `mod` (2 ^ i) == 0 = i
       | otherwise = go num (i-1)
+
+
+instance Num (Stream Integer) where
+  {- fromInteger :: Integer -> Stream Integer -}
+  fromInteger n = Cons n $ streamRepeat 0
+  negate = streamMap negate
+  (+) = streamZip (+) where
+    streamZip :: (a -> b -> c) -> Stream a -> Stream b -> Stream c
+    streamZip f (Cons v1 s1) (Cons v2 s2) = Cons (f v1  v2) (streamZip f s1 s2)
+  
